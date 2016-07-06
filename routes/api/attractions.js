@@ -30,6 +30,18 @@ router.get('/activities', function(req, res, next) {
 	.catch(next);
 });
 
+// router.get('/associatedDays',function(req,res,next){
+// 	Activity.findAll({
+// 		where: {
+// 			dayId: {$gte: 0}
+// 		}
+// 	})
+// 	.then(function(activities){
+// 		res.json(activities);
+// 	})
+// 	.catch(next);
+// });
+
 //This would be routes/api/days.js if in a separate file
 
 

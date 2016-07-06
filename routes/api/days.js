@@ -4,6 +4,7 @@ var Hotel = require('../../models/hotel');
 var Restaurant = require('../../models/restaurant');
 var Activity = require('../../models/activity');
 var Day=require('../../models/day');
+var db = require('../../models');
 
 // router.get('/:id', function (req, res, next) {
 // 	console.log('getting specific day');
@@ -11,17 +12,25 @@ var Day=require('../../models/day');
 // });
 
 router.get('/', function (req, res, next) {
-	Day.findAll()
+	Day.findAll({
+		include: [Hotel,Restaurant,Activity],
+		order: [
+    		['number', 'ASC']
+    	]
+	})
 	.then(function(result){
 		res.json(result);
 	})
 	.catch(next);
 });
 
-router.put('/:id', function (req, res, next) {
-	Day.findById(req.params.id)
+router.post('/:id', function (req, res, next) {
+	Day.findById(Number(req.params.id))
 	.then(function (day) {
-		day.destroy();
+		if(day){ //get rid of check?
+			day.destroy();
+		}
+		res.end();
 	})
 	.catch(next);
 });
@@ -41,18 +50,73 @@ router.post('/', function (req, res, next) {
 });
 
 router.post('/:id/restaurants', function (req, res, next) {
-	console.log('adding a new restaurant');
-	next();
+	var currentDayPromise=Day.findById(req.body.dayId);
+	var attractionToAdd=Restaurant.findById(req.params.id);
+	Promise.all([currentDayPromise,attractionToAdd])
+	.spread(function(day,attraction){
+		day.addRestaurant(attraction);
+	})
+	.then(db.sync())
+	.catch(next);
+
 });
 
 router.post('/:id/hotels', function (req, res, next) {
-	console.log('adding a new hotel');
-	next();
+	currentDayPromise=Day.findById(req.body.dayId);
+	attractionToAdd=Hotel.findById(req.params.id);
+	Promise.all([currentDayPromise,attractionToAdd])
+	.spread(function(day,attraction){
+		day.setHotel(attraction);
+	})
+	.then(db.sync())
+	.catch(next);
 });
 
 router.post('/:id/activities', function (req, res, next) {
-	console.log('adding a new activity');
-	next();
+	currentDayPromise=Day.findById(req.body.dayId);
+	attractionToAdd=Activity.findById(req.params.id);
+	Promise.all([currentDayPromise,attractionToAdd])
+	.spread(function(day,attraction){
+		day.addActivity(attraction);
+	})
+	.then(db.sync())
+	.catch(next);
+
+});
+
+
+router.post('/:id/restaurants/delete', function (req, res, next) {
+	console.log('deleting a restaurant on day id '+req.body.dayId);
+	var currentDayPromise=Day.findById(req.body.dayId);
+	var attractionToDelete=Restaurant.findById(req.params.id);
+	Promise.all([currentDayPromise,attractionToDelete])
+	.spread(function(day,attraction){
+		day.removeRestaurant(attraction);
+	})
+	.then(db.sync())
+	.catch(next);
+});
+router.post('/:id/hotels/delete', function (req, res, next) {
+	console.log('deleting a hotel on day id '+req.body.dayId);
+	var currentDayPromise=Day.findById(req.body.dayId);
+	var attractionToDelete=Hotel.findById(req.params.id);
+	Promise.all([currentDayPromise,attractionToDelete])
+	.spread(function(day,attraction){
+		day.setHotel(null);
+	})
+	.then(db.sync())
+	.catch(next);
+});
+router.post('/:id/activities/delete', function (req, res, next) {
+	console.log('deleting activity on day id '+req.body.dayId);
+	var currentDayPromise=Day.findById(req.body.dayId);
+	var attractionToDelete=Activity.findById(req.params.id);
+	Promise.all([currentDayPromise,attractionToDelete])
+	.spread(function(day,attraction){
+		day.removeActivity(attraction);
+	})
+	.then(db.sync())
+	.catch(next);
 });
 
 // router.get('/hotels', function(req, res, next) {

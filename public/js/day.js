@@ -112,7 +112,12 @@ var dayModule = (function () {
   };
 
   Day.prototype.removeAttraction = function (attraction) {
-    // removing from the day object
+    var dayId=daysModule.getCurrentDay().id;
+    var url='/api/days/'+attraction.id+'/'+attraction.type+'s/delete';
+    if(attraction.type==='activity'){
+      url='/api/days/'+attraction.id+'/activities/delete';      
+    }
+    $.post(url,{dayId:dayId}) 
     switch (attraction.type) {
       case 'hotel':
         this.hotel = null;

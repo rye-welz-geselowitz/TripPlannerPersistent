@@ -36,7 +36,30 @@ var optionsModule=(function(){
     .find(':selected')
     .data()
     .obj;
+    var dayNum=$('.current-day').text();
+    console.log(dayNum);
+    var dayId=daysModule.getCurrentDay().id;
+    if(attraction.type==='hotel'){
+      $.post('/api/days/'+attraction.id+'/hotels',{dayId:dayId}); 
+
+    }
+    if(attraction.type==='restaurant'){
+      $.post('/api/days/'+attraction.id+'/restaurants',{dayId:dayId}) 
+
+    }
+      if(attraction.type==='activity'){
+      $.post('/api/days/'+attraction.id+'/activities',{dayId:dayId}) 
+
+    }
+    //figure out attraction type - check this.type??
+    //convert the attraction to a form that can be added to DB
+    //--can you use merge? or do it manually?
+    //use $.post('/api/id/<attractionType>') 
+    //pass in some data - the object that will become databse item
+    //also need to pass in the currentDay (just use variable currentDay)??
+    //THEN 
     daysModule.addToCurrent(attraction);
+
   });
 
   var methods={

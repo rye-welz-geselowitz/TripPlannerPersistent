@@ -34,6 +34,7 @@ var daysModule = (function () {
 
   function switchTo (newCurrentDay) {
     if (currentDay) currentDay.hide();
+    console.log('newCurrentDay',newCurrentDay);
     currentDay = newCurrentDay;
     currentDay.show();
   }
@@ -46,37 +47,41 @@ var daysModule = (function () {
   });
 
 
-  function addDayToDOM(){
+  function addDayToDOM(id){
     if (this && this.blur) this.blur(); // removes focus box from buttons
     var newDay = dayModule.create({ number: days.length + 1 }); // dayModule
+    newDay.id=id;
     days.push(newDay);
     if (days.length === 1) {
       currentDay = newDay;
       switchTo(currentDay);
     }    
+    return newDay;
   }
 
-  function addDay () {
-    addDayToDOM();
+  function addDay (id) {
+    return addDayToDOM(id);
   }
 
   function addDayAndUpdateDb () {
     $.post('/api/days') 
-    .then(function(result){ //NEED TO ASSOCIATE DOM DAYS WITH RESULT.ID
-      addDayToDOM();     
+    .then(function(newDay){ //NEED TO ASSOCIATE DOM DAYS WITH RESULT.ID
+      addDayToDOM(newDay.id);     
     })
     .catch(console.error.bind(console));
   }
 
-  function removeFromDb () { 
-    $.ajax({
-      method: 'PUT',
-      url: '/api/days'
-    })
+  function removeFromDb () {
+    var url='/api/days/'+currentDay.id.toString();
+    $.post(url)
     .then(function () {
       deleteCurrentDay();
     })
     .catch(console.error.bind(console));
+    if(currentDay.number===1){
+      currentDay.hide(); //I added this - not sure if it's the best way??
+      currentDay.hideButton();
+    }
   }
 
   function deleteCurrentDay () {
@@ -99,7 +104,10 @@ var daysModule = (function () {
   var methods = {
 
     load: function () {
-      $(addDay);
+      //$(addDay);
+      var newDay=addDay();
+      return newDay;
+      //return $(addDay);;
     },
 
     switchTo: switchTo,
@@ -110,6 +118,9 @@ var daysModule = (function () {
 
     removeFromCurrent: function (attraction) {
       currentDay.removeAttraction(attraction);
+    },
+    getCurrentDay: function(){
+      return currentDay;
     }
 
   };

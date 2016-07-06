@@ -42,6 +42,9 @@ var attractionsModule=(function() {
     var self = this;
     $button.on('click', function () {
       daysModule.removeFromCurrent(self); // remove from day model
+      //FILL ME IN!!!!
+      //figure out attraction type - check this.type??
+      //use $.post('/api/id/<attractionType>/delete') 
     });
     return this;
   };

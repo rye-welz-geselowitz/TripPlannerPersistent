@@ -6,8 +6,9 @@ var activitiesPromise = $.get('/api/attractions/activities');
 
 Promise.all([hotelsPromise,restaurantsPromise,activitiesPromise])
 .then(function(result){
-	var hotelsArr=result[0];
-	var restaurantsArr=result[1];
+	//console.log(result);
+	var hotelsArr=result[1];
+	var restaurantsArr=result[0];
 	var activitiesArr=result[2];
 	optionsModule.fillSelectBar(hotelsArr, restaurantsArr, activitiesArr);
 })
